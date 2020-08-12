@@ -1,0 +1,24 @@
+{
+  "name": "longadjacency",
+  "version": "0.0.1",
+  "description": "A simple, all-client-side web app to transform Adjacency lists into Edge Lists.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/LongAdjacency.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/CDCgov/LongAdjacency/issues"
+  },
+  "homepage": "https://github.com/CDCgov/LongAdjacency#readme",
+  "dependencies": {
+    "bootstrap": "^5.0.0-alpha1",
+    "popper.js": "^1.16.0",
+    "xlsx": "^0.16.5"
+  }
+}

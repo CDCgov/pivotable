@@ -1,25 +1,41 @@
-# CDCgov GitHub Organization Open Source Project Template
+# LongAdjacency
 
-**Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
+A simple, all-client-side web app to transform Adjacency lists into Edge Lists.
+
+## What is this?
+
+Frequently, contact tracing data is recorded in a format like this:
+
+| Individual | Contact1 | Contact2 | Contact 3 |
+| ---------- | -------- | -------- | --------- |
+| A          | B        | C        | D         |
+| B          | A        | C        |           |
+
+This is what we'll call an adjacency list. It's pretty readable, very understandable, and very easy to create in a tool like Microsoft Excel. If your individual recalls another contact, you can just add another column, easy-peasy. But then you need to do analysis with it and your analytic tools groan and complain and crash. These things HATE this format. It isn't [tidy](https://vita.had.co.nz/papers/tidy-data.pdf)!
+
+There's another, better format out there. It's called an Edge list and it works like this:
+
+| Individual | Contact |
+| ---------- | ------- |
+| A          | B       | 
+| A          | C       |
+| A          | D       |
+| B          | A       |
+| B          | C       |
+
+Now, instead of having a row for each person, we have a row for each instance of contact between individuals. We've fundamentally altered the data's unit-of-analysis, translating the table into a [long](https://sejdemyr.github.io/r-tutorials/basics/wide-and-long/) format. It's still pretty readable, and your statistical algorithms will positively zip through it.
+
+LongAdjacency is a tool designed to help you convert your data into Long format from Adjacency lists. Get it?
+
+## How do I do it?
+
+Just drag your adjacency list into the app and drop it. The app will parse the file and show you a preview of the table. Then you pick all your "ContactX" Columns (as in the example above) and the app will automatically wrangle the data into Edge list format. Once it looks alright, you can download the Edge list output.
+
+## But this is PHI!
+
+No worries! This application runs entirely on your computer--not on a server somewhere else. It's totally safe to load your PHI into it. If you're really paranoid, you can even load the web app and then *disconnect your computer from the internet* before loading your data in the app.
 
 **General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
-
-## Access Request, Repo Creation Request
-
-* [CDC GitHub Open Project Request Form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) _[Requires a CDC Office365 login, if you do not have a CDC Office365 please ask a friend who does to submit the request on your behalf. If you're looking for access to the CDCEnt private organization, please use the [GitHub Enterprise Cloud Access Request form](https://forms.office.com/Pages/DesignPage.aspx?origin=OfficeDotCom&lang=en-US#FormId=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUQjVJVDlKS1c0SlhQSUxLNVBaOEZCNUczVS4u&Preview=%7B%22PreviousTopView%22%3A%22None%22%7D&TopView=Preview).]_
-
-## Related documents
-
-* [Open Practices](open_practices.md)
-* [Rules of Behavior](rules_of_behavior.md)
-* [Thanks and Acknowledgements](thanks.md)
-* [Disclaimer](DISCLAIMER.md)
-* [Contribution Notice](CONTRIBUTING.md)
-* [Code of Conduct](code-of-conduct.md)
-
-## Overview
-
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
   
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not

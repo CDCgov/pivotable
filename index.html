@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>LongAdjacency</title>
+    <link rel="canonical" href="https://cdcgov.github.io/LongAdjacency">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <meta name="theme-color" content="#7952b3">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      #drop-area {
+        border: 2px dashed #ccc;
+        border-radius: 20px;
+        width: 480px;
+        font-family: sans-serif;
+        margin: 100px auto;
+        padding: 20px;
+      }
+      #drop-area.highlight {
+        border-color: purple;
+      }
+      p {
+        margin-top: 0;
+      }
+      .my-form {
+        margin-bottom: 10px;
+      }
+      #gallery {
+        margin-top: 10px;
+      }
+      #gallery img {
+        width: 150px;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px;
+        background: #ccc;
+        cursor: pointer;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+      .button:hover {
+        background: #ddd;
+      }
+      #fileElem {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+  <h5 class="my-0 mr-md-auto font-weight-normal">LongAdjacency</h5>
+  <nav class="my-2 my-md-0 mr-md-3">
+    <a class="p-2 text-dark" href="https://github.com/CDCgov/LongAdjacency#cdcgov-github-organization-open-source-project-template">About</a>
+    <a class="p-2 text-dark" href="https://github.com/CDCgov/LongAdjacency/wiki">Help</a>
+  </nav>
+</div>
+
+<div id="drop-area" class="container pt-5">
+  <form class="my-form">
+    <p>Load an Adjacency List by dragging and dropping it onto the dashed region</p>
+    <input type="file" id="fileElem" onchange="handleDrop">
+    <label class="button" for="fileElem">Select some files</label>
+  </form>
+</div>
+
+<div id="table-wrapper" class="container pt-5 d-none">
+  <div class="row">
+    <div class="col">
+      <table id="review-table" class="table border">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>  
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.16.5/dist/xlsx.min.js"></script>
+<script src="http://spin.js.org/spin.umd.js"></script>
+<script>
+
+var pending = false;
+
+var rABS = typeof FileReader !== "undefined" && typeof FileReader.prototype !== "undefined" && typeof FileReader.prototype.readAsBinaryString !== "undefined";
+
+function fixdata(data) {
+  var o = "", l = 0, w = 10240;
+  for(; l<data.byteLength/w; ++l) o+=String.fromCharCode.apply(null,new Uint8Array(data.slice(l*w,l*w+w)));
+  o+=String.fromCharCode.apply(null, new Uint8Array(data.slice(l*w)));
+  return o;
+}
+
+function process_wb(wb) {
+  console.log(wb);
+  var o = XLSX.utils.sheet_to_html(wb.Sheets[wb.SheetNames[0]], {editable:true}).replace("<table", '<table id="review-table" class="table"')
+  document.getElementById('review-table').outerHTML = o;
+  document.getElementById('drop-area').classList.add('d-none');
+  document.getElementById('table-wrapper').classList.remove('d-none');
+  pending = false;
+}
+
+var drop = document.getElementById('drop-area');
+
+function xw(data, cb) {
+  pending = true;
+  var worker = new Worker('./modify.js');
+  worker.onmessage = function(e) {
+    switch(e.data.t) {
+      case 'ready': break;
+      case 'e': pending = false; console.error(e.data.d); break;
+      case 'xlsx': cb(JSON.parse(e.data.d)); break;
+    }
+  };
+  var arr = rABS ? data : btoa(fixdata(data));
+  worker.postMessage({d:arr,b:rABS});
+}
+
+function handleDrop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  if(pending) return console.log('Please wait until the current file is processed.');
+  var files = e.dataTransfer.files;
+  var f = files[0];
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if(typeof console !== 'undefined') console.log("onload", new Date());
+    var data = e.target.result;
+    function doitnow() {
+      try {
+        xw(data, process_wb);
+      } catch(e) {
+        console.log('We unfortunately dropped the ball here.  Please test the file using the <a href="/sheetjs/">raw parser</a>.  If there are issues with the file processor, please send this file to <a href="mailto:dev@sheetjs.com?subject=I+broke+your+stuff">dev@sheetjs.com</a> so we can make things right.', e);
+        pending = false;
+      }
+    }
+    if(e.target.result.length > 1e6) console.log("This file is " + e.target.result.length + " bytes and may take a few moments.  Your browser may lock up during this process.  Shall we play?", function(k) { if(k) doitnow(); });
+    else doitnow();
+  };
+  if(rABS) reader.readAsBinaryString(f);
+  else reader.readAsArrayBuffer(f);
+}
+
+function handleDragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+if(drop.addEventListener) {
+  drop.addEventListener('dragenter', handleDragover, false);
+  drop.addEventListener('dragover', handleDragover, false);
+  drop.addEventListener('drop', handleDrop, false);
+}
+
+</script>
+  </body>
+</html>
