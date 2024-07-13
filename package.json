@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/CDCgov/LongAdjacency#readme",
   "dependencies": {
-    "bootstrap": "^5.0.0-alpha1",
+    "bootstrap": "^5.0.0",
     "popper.js": "^1.16.0",
     "xlsx": "^0.16.5"
   }
